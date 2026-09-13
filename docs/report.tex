@@ -130,14 +130,16 @@ Figure~\ref{fig:verified} contains only matches retained as RANSAC inliers over 
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[t]{0.49\linewidth}
+    \begin{subfigure}[t]{0.82\linewidth}
         \centering
         \includegraphics[width=\linewidth]{naive_matches.jpg}
         \caption{Naive ratio-test matches.}
         \label{fig:naive}
     \end{subfigure}
-    \hfill
-    \begin{subfigure}[t]{0.49\linewidth}
+
+    \vspace{0.7cm}
+
+    \begin{subfigure}[t]{0.82\linewidth}
         \centering
         \includegraphics[width=\linewidth]{verified_matches.jpg}
         \caption{RANSAC-verified inlier matches.}
@@ -155,6 +157,7 @@ The final output in Figure~\ref{fig:final} is much easier to read than the raw m
     \caption{Final oriented outlines after affine verification, greedy extraction, and IoU non-maximum suppression. Each green quadrilateral is the template's four corners projected by its affine model; candidates are scored by RANSAC inlier count. Some false positives remain in this highly cluttered scene.}
     \label{fig:final}
 \end{figure}
+\clearpage
 
 \section{Limitations and next steps}
 The experiment exposes expected limits of a local-feature pipeline. First, a three-vote minimum is intentionally permissive and can allow weak Hough clusters through RANSAC. Raising the minimum vote or inlier requirement would likely remove some false positives, although it might also miss a more occluded notebook. Second, the final NMS uses axis-aligned boxes, while the physical notebooks are rotated; polygon-aware overlap could better express duplicate detections. Third, the affine model is a pragmatic approximation. A projective model could handle stronger viewpoint changes, but it would require more correspondences and a different estimator.
