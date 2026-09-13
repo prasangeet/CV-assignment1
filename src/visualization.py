@@ -73,36 +73,57 @@ class Visualizer:
         image: np.ndarray,
         detections: list[Detection],
     ) -> np.ndarray:
-        """Draw final detection boxes on an image."""
+        """Draw oriented detection outlines when projected corners are available."""
 
         output = image.copy()
 
         for index, detection in enumerate(detections, start=1):
-            x1, y1, x2, y2 = detection.box
+            if detection.corners is not None:
+                polygon = np.rint(
+                    np.array(detection.corners, dtype=np.float64)
+                ).astype(np.int32).reshape((-1, 1, 2))
 
-            top_left = (
-                int(round(x1)),
-                int(round(y1)),
-            )
+                cv2.polylines(
+                    output,
+                    [polygon],
+                    isClosed=True,
+                    color=(0, 255, 0),
+                    thickness=2,
+                    lineType=cv2.LINE_AA,
+                )
 
-            bottom_right = (
-                int(round(x2)),
-                int(round(y2)),
-            )
+                label_x, label_y = min(
+                    detection.corners,
+                    key=lambda corner: corner[1],
+                )
+            else:
+                x1, y1, x2, y2 = detection.box
 
-            cv2.rectangle(
-                output,
-                top_left,
-                bottom_right,
-                (0, 255, 0),
-                2,
-            )
+                top_left = (
+                    int(round(x1)),
+                    int(round(y1)),
+                )
+
+                bottom_right = (
+                    int(round(x2)),
+                    int(round(y2)),
+                )
+
+                cv2.rectangle(
+                    output,
+                    top_left,
+                    bottom_right,
+                    (0, 255, 0),
+                    2,
+                )
+
+                label_x, label_y = top_left
 
             label = f"Object {index} ({detection.score:.2f})"
 
             label_origin = (
-                top_left[0],
-                max(20, top_left[1] - 8),
+                int(round(label_x)),
+                max(20, int(round(label_y)) - 8),
             )
 
             cv2.putText(

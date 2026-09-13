@@ -16,8 +16,8 @@ OpenCV is used only where the assignment permits it: image I/O, colour conversio
 2. **Scene-to-template matching** — computes Euclidean descriptor distances with NumPy and applies Lowe's ratio test (`0.75`) to reject ambiguous matches.
 3. **4D Generalized Hough voting** — each surviving match predicts an object centre, scale, and rotation. Votes are quantized into `(x, y, scale, angle)` bins.
 4. **Affine RANSAC** — samples three correspondences, rejects collinear samples, estimates an affine transform with a least-squares solve, and retains low-reprojection-error inliers.
-5. **Greedy multi-instance extraction** — after a valid instance is found, its inlier matches are removed and the remaining matches are processed again.
-6. **Non-maximum suppression** — ranks detections by inlier count and removes overlapping boxes using IoU.
+5. **Greedy multi-instance extraction** — after a valid instance is found, its inlier matches are removed and the remaining matches are processed again. The template's four affine-projected corners are retained so that each detection can be drawn at its true orientation.
+6. **Non-maximum suppression** — ranks detections by inlier count and removes overlapping axis-aligned envelopes using IoU; the final visualization still draws the oriented quadrilateral.
 
 No OpenCV matcher, OpenCV affine-estimation routine, homography routine, or external clustering package is used for the recognition logic.
 
@@ -52,7 +52,7 @@ It writes these visualizations to `outputs/`:
 | --- | --- |
 | `naive_matches.jpg` | Ratio-test matches before geometric verification; useful for seeing why matching alone is not enough. |
 | `verified_matches.jpg` | Matches retained as RANSAC inliers during greedy extraction. |
-| `final_detections.jpg` | The scene with the final NMS-filtered candidate boxes. |
+| `final_detections.jpg` | The scene with final NMS-filtered candidate outlines, drawn at their estimated orientations. |
 
 Generated output is intentionally ignored by Git, so running the pipeline will not clutter commits.
 

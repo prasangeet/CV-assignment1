@@ -3,10 +3,11 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Detection:
-    """A detected object instance."""
+    """A detected object instance with optional oriented corners."""
 
     box: tuple[float, float, float, float]
     score: float
+    corners: tuple[tuple[float, float], ...] | None = None
 
 
 class NonMaximumSuppression:

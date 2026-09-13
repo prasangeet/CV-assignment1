@@ -136,6 +136,32 @@ def test_draw_detections_returns_copy() -> None:
     assert not np.array_equal(result, original)
 
 
+def test_draw_oriented_detection() -> None:
+    """Projected corners should be drawn as an oriented polygon."""
+
+    image = np.zeros(
+        (200, 200, 3),
+        dtype=np.uint8,
+    )
+
+    detection = Detection(
+        box=(40.0, 40.0, 160.0, 160.0),
+        score=10.0,
+        corners=(
+            (100.0, 40.0),
+            (160.0, 100.0),
+            (100.0, 160.0),
+            (40.0, 100.0),
+        ),
+    )
+
+    result = Visualizer.draw_detections(image, [detection])
+
+    assert not np.array_equal(result, image)
+    assert np.any(result[40, 100] != 0)
+    assert np.all(result[40, 40] == 0)
+
+
 def test_draw_detections_preserves_dimensions() -> None:
     """Detection visualization should preserve image dimensions."""
 

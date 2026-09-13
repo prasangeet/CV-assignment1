@@ -5,6 +5,7 @@
 \usepackage{lmodern}
 \usepackage{microtype}
 \usepackage{graphicx}
+\usepackage{subcaption}
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{hyperref}
@@ -93,7 +94,7 @@ For $n$ correspondences, the six unknown parameters are solved with the least-sq
 A final sanity check rejects reflected, singular, excessively scaled, or heavily sheared transformations. In particular, the linear component must have positive determinant, a scale between 0.25 and 4.0, and a condition number no larger than 3.0.
 
 \subsection{Iterative extraction and NMS}
-After accepting a model, the template corners are projected through it and converted to an axis-aligned bounding box. Its RANSAC inliers are removed from the active match list, then Hough voting and verification repeat to seek another instance. Finally, detections are ranked by their inlier counts and standard IoU non-maximum suppression removes lower-scoring boxes whose overlap is at least 0.5.
+After accepting a model, the four template corners are projected through it. These corners are retained and rendered as an oriented quadrilateral, so the final boundary follows the estimated rotation instead of being forced into an axis-aligned rectangle. Their axis-aligned envelope is additionally stored for IoU-based suppression. The RANSAC inliers are removed from the active match list, then Hough voting and verification repeat to seek another instance. Finally, detections are ranked by their inlier counts and standard IoU non-maximum suppression removes lower-scoring envelopes whose overlap is at least 0.5.
 
 \section{Implementation summary}
 Table~\ref{tab:parameters} lists the principal configuration values. They are centralized in \texttt{main.py} to make experiments easier to reproduce.
@@ -125,28 +126,33 @@ The updated high-detail configuration uses a 2560-pixel processing limit and a 6
 
 Figure~\ref{fig:naive} visualizes the matches surviving the descriptor-ratio test. Although many lines terminate around real notebook details, the picture remains hard to interpret. Similar colours, repeated pomegranate texture, notebook edges, and general clutter all create plausible local correspondences. This is precisely why nearest-neighbour matching cannot be treated as an object detector.
 
+Figure~\ref{fig:verified} contains only matches retained as RANSAC inliers over the greedy extraction process. Relative to Figure~\ref{fig:naive}, the evidence is more structured, but correspondence overlays still do not communicate the final localization as clearly as oriented boundaries.
+
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\linewidth]{naive_matches.jpg}
-    \caption{Naive ratio-test matches. The dense set of lines illustrates that descriptor similarity alone does not provide a clean instance-level decision.}
-    \label{fig:naive}
+    \begin{subfigure}[t]{0.49\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{naive_matches.jpg}
+        \caption{Naive ratio-test matches.}
+        \label{fig:naive}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.49\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{verified_matches.jpg}
+        \caption{RANSAC-verified inlier matches.}
+        \label{fig:verified}
+    \end{subfigure}
+    \caption{Match refinement. The ratio test removes ambiguous nearest-neighbour matches, while Hough clustering and affine RANSAC retain evidence that agrees on a common object pose.}
+    \label{fig:match-comparison}
 \end{figure}
 
-Figure~\ref{fig:verified} contains only matches retained as RANSAC inliers over the greedy extraction process. Relative to Figure~\ref{fig:naive}, the evidence is more structured, but correspondence overlays still do not communicate the final localization as clearly as boxes.
+The final output in Figure~\ref{fig:final} is much easier to read than the raw match overlay. It places oriented quadrilateral boundaries on notebook instances across different rotations and scales. However, it also retains candidate boxes that do not cleanly correspond to a notebook. The headset and large regions of background are particularly challenging. Therefore, the correct interpretation is not ``perfect detection'' but a substantial reduction of noisy matches into a small, inspectable set of hypotheses.
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\linewidth]{verified_matches.jpg}
-    \caption{Geometrically verified matches retained by the affine-RANSAC stage.}
-    \label{fig:verified}
-\end{figure}
-
-The final output in Figure~\ref{fig:final} is much easier to read than the raw match overlay. It places several boxes on notebook instances across different rotations and scales. However, it also retains candidate boxes that do not cleanly correspond to a notebook. The headset and large regions of background are particularly challenging. Therefore, the correct interpretation is not ``perfect detection'' but a substantial reduction of noisy matches into a small, inspectable set of hypotheses.
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.82\linewidth]{final_detections.jpg}
-    \caption{Final boxes after affine verification, greedy extraction, and IoU non-maximum suppression. Green boxes are candidate detections scored by RANSAC inlier count. Some false positives remain in this highly cluttered scene.}
+    \includegraphics[width=0.68\linewidth]{final_detections.jpg}
+    \caption{Final oriented outlines after affine verification, greedy extraction, and IoU non-maximum suppression. Each green quadrilateral is the template's four corners projected by its affine model; candidates are scored by RANSAC inlier count. Some false positives remain in this highly cluttered scene.}
     \label{fig:final}
 \end{figure}
 
@@ -163,6 +169,7 @@ uv run python main.py
 \end{verbatim}
 The script reads \texttt{data/template.jpg} and \texttt{data/scene.jpg}, then creates the three images used above in \texttt{outputs/}. RANSAC is initialized with seed 42, so its sampled hypotheses are repeatable for a fixed software environment. The complete source is organized by pipeline stage in \texttt{src/}; the project README provides a concise map of the files and available settings.
 
+\clearpage
 \begin{thebibliography}{9}
 
 \bibitem{lowe2004sift}

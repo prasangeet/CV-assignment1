@@ -221,7 +221,12 @@ def test_to_detection() -> None:
     )
 
     assert detection.box == pytest.approx((100.0, 50.0, 200.0, 100.0))
-
+    assert detection.corners == (
+        (100.0, 50.0),
+        (200.0, 50.0),
+        (200.0, 100.0),
+        (100.0, 100.0),
+    )
     assert detection.score == pytest.approx(12.5)
 
 

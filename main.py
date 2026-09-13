@@ -509,9 +509,19 @@ def scale_detection(
         y2 * inverse_scale,
     )
 
+    original_corners = (
+        tuple(
+            (x * inverse_scale, y * inverse_scale)
+            for x, y in detection.corners
+        )
+        if detection.corners is not None
+        else None
+    )
+
     return Detection(
         box=original_box,
         score=detection.score,
+        corners=original_corners,
     )
 
 

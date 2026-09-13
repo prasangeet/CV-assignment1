@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import cast
 
 import numpy as np
 import numpy.typing as npt
@@ -88,7 +89,16 @@ class DetectionProjector:
     ) -> Detection:
         """Convert a projected template into a detection."""
 
+        corners: tuple[tuple[float, float], ...] = tuple(
+            (
+                cast(float, projected.corners[index, 0]),
+                cast(float, projected.corners[index, 1]),
+            )
+            for index in range(len(projected.corners))
+        )
+
         return Detection(
             box=projected.bounding_box,
             score=score,
+            corners=corners,
         )
