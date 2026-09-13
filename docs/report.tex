@@ -55,7 +55,7 @@ The goal is to locate multiple copies of one object in a photograph that contain
 \end{figure}
 
 \section{Method}
-The pipeline has six stages. The main program limits each image's largest dimension to 1280 pixels before processing; detections are then mapped back to the original scene coordinates for display.
+The pipeline has six stages. The main program limits each image's largest dimension to 2560 pixels before processing; detections are then mapped back to the original scene coordinates for display.
 
 \subsection{SIFT features}
 SIFT is used to detect local keypoints and compute 128-dimensional descriptors for both images \cite{lowe2004sift}. This is the one recognition component delegated to OpenCV \cite{opencv_library}, as allowed by the assignment. SIFT supplies location $\mathbf{p}$, scale $s$, orientation $\theta$, and a descriptor vector $\mathbf{d}$ for every keypoint.
@@ -106,7 +106,7 @@ Table~\ref{tab:parameters} lists the principal configuration values. They are ce
         \toprule
         Parameter & Value \\
         \midrule
-        Maximum SIFT features & 2000 \\
+        Maximum SIFT features & 6000 \\
         Lowe ratio threshold & 0.75 \\
         Hough position bin & 20 px \\
         Hough scale bin & 0.1 \\
@@ -121,7 +121,7 @@ Table~\ref{tab:parameters} lists the principal configuration values. They are ce
 \end{table}
 
 \section{Results and discussion}
-On the supplied images, the implementation extracted 1138 template keypoints and 2000 scene keypoints. Lowe's ratio test retained 279 matches. The greedy stage accepted 25 affine hypotheses and accumulated 176 verified inlier matches; IoU NMS reduced these to four final candidate boxes. These are pipeline measurements, not ground-truth accuracy metrics: the scene has not been manually annotated, so precision and recall are deliberately not claimed.
+The updated high-detail configuration uses a 2560-pixel processing limit and a 6000-feature SIFT cap. On the supplied images, it extracted 2070 template keypoints and 6000 scene keypoints; the scene count reaches the configured cap. Lowe's ratio test retained 893 matches. The greedy stage accepted 77 affine hypotheses and accumulated 573 verified inlier matches; IoU NMS reduced these to four final candidate boxes. These are pipeline measurements, not ground-truth accuracy metrics: the scene has not been manually annotated, so precision and recall are deliberately not claimed.
 
 Figure~\ref{fig:naive} visualizes the matches surviving the descriptor-ratio test. Although many lines terminate around real notebook details, the picture remains hard to interpret. Similar colours, repeated pomegranate texture, notebook edges, and general clutter all create plausible local correspondences. This is precisely why nearest-neighbour matching cannot be treated as an object detector.
 

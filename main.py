@@ -28,8 +28,8 @@ FINAL_DETECTIONS_PATH = OUTPUT_DIR / "final_detections.jpg"
 # Feature extraction
 # ---------------------------------------------------------
 
-MAX_IMAGE_SIZE = 1280
-MAX_SIFT_FEATURES = 2000
+MAX_IMAGE_SIZE = 2560
+MAX_SIFT_FEATURES = 6000
 
 RATIO_THRESHOLD = 0.75
 

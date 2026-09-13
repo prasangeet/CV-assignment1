@@ -82,9 +82,9 @@ The main parameters live near the top of `main.py`:
 
 | Setting | Value | Purpose |
 | --- | ---: | --- |
-| Maximum SIFT features | 2000 | Bounds the number of extracted features. |
+| Maximum SIFT features | 6000 | Retains more scene detail for challenging multi-instance matching. |
 | Ratio threshold | 0.75 | Lower values are stricter about descriptor ambiguity. |
-| Position / scale / angle bins | 20 px / 0.1 / 15° | Controls how similar Hough votes must be to form a cluster. |
+| Maximum processing dimension | 2560 px | Preserves useful detail while bounding memory use. |\n| Position / scale / angle bins | 20 px / 0.1 / 15° | Controls how similar Hough votes must be to form a cluster. |
 | Minimum Hough votes | 3 | Minimum evidence before a cluster is verified. |
 | RANSAC iterations | 500 | Number of affine hypotheses sampled per cluster. |
 | Reprojection threshold | 5 px | Maximum error for an affine inlier. |
